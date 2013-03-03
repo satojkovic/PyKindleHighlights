@@ -30,7 +30,10 @@ class KindleHighlight(object):
 
         # get next link
         root = lxml.html.fromstring(highlights_page.read())
-        
+
+        hl = root.xpath("//span[@class='highlight']")
+        for h in hl:
+            print h.text
         next_book = root.xpath("//a[@id='nextBookLink']")
         next_url = ''
         for nb in next_book:
@@ -42,6 +45,10 @@ class KindleHighlight(object):
         n1 = self.br.follow_link(url=next_url)
 
         p1 = lxml.html.fromstring(n1.read())
+
+        hl1 = p1.xpath("//span[@class='highlight']")
+        for h in hl1:
+            print h.text
         next_book1 = p1.xpath("//a[@id='nextBookLink']")
         next_url1 = ''
         for nb in next_book1:
@@ -53,6 +60,9 @@ class KindleHighlight(object):
         n2 = self.br.follow_link(url=next_url1)
 
         p2 = lxml.html.fromstring(n2.read())
+        hl2 = p2.xpath("//span[@class='highlight']")
+        for h in hl2:
+            print h.text
         next_book2 = p2.xpath("//a[@id='nextBookLink']")
         next_url2 = ''
         for nb in next_book2:
