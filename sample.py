@@ -8,7 +8,7 @@ def main():
 
     kindle = PyKindleHighlights(config['email'], config['password'])
 
-    for k, v in kindle.books2highlighs.items():
+    for k, v in kindle.books2highlights.items():
         print '[title] %s' % k
         print '[author] %s' % v['author']
         for text in v['text']:

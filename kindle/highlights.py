@@ -28,7 +28,7 @@ class PyKindleHighlights(object):
         highlights_page = self.br.follow_link(url_regex='your_highlights')
 
         # scrape next book
-        self.books2highlighs = dict(dict([]))        
+        self.books2highlights = dict(dict([]))        
         self.get_next_books(highlights_page)
 
     def get_next_books(self, page):
@@ -48,7 +48,7 @@ class PyKindleHighlights(object):
             harray.append(h.text)
         hdic['text'] = harray
 
-        self.books2highlighs[title] = hdic
+        self.books2highlights[title] = hdic
 
         # get next book
         next_book = dom.xpath("//a[@id='nextBookLink']")
