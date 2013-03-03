@@ -20,75 +20,57 @@ class KindleHighlight(object):
         self.br.select_form(name = 'signIn')
         self.br['email'] = email
         self.br['password'] = password
-        self.books2highlighs = dict(dict([]))
 
         signedin_page = self.br.submit()
         self.scrape_highlights(signedin_page)
 
     def scrape_highlights(self, signedin_page):
+        # follow link
         highlights_page = self.br.follow_link(url_regex='your_highlights')
 
-        # get next link
-        root = lxml.html.fromstring(highlights_page.read())
-
-        t1 = root.xpath("//span[@class='title']/a")
-        for t in t1:
-            print t.text.strip()
-        a1 = root.xpath("//span[@class='author']")
-        for a in a1:
-            print a.text.strip()
-        hl = root.xpath("//span[@class='highlight']")
-        for h in hl:
-            print h.text.strip()
-        next_book = root.xpath("//a[@id='nextBookLink']")
-        next_url = ''
-        for nb in next_book:
-            next_url = nb.attrib['href']
-            print nb.attrib['href']
-
         # scrape next book
-        n1 = self.br.follow_link(url=next_url)
+        self.books2highlighs = dict(dict([]))        
+        self.get_next_books(highlights_page)
 
-        p1 = lxml.html.fromstring(n1.read())
+    def get_next_books(self, page):
+        dom = lxml.html.fromstring(page.read())
 
-        hl1 = p1.xpath("//span[@class='highlight']")
-        for h in hl1:
-            print h.text
-        next_book1 = p1.xpath("//a[@id='nextBookLink']")
-        next_url1 = ''
-        for nb in next_book1:
-            next_url1 = nb.attrib['href']
-            print next_url1
+        # get title, author, highlights
+        title = dom.xpath("//span[@class='title']/a")
+        title = title[0].text.strip()
 
-        # scrape next next book
-        n2 = self.br.follow_link(url=next_url1)
+        hdic = {}
+        author = dom.xpath("//span[@class='author']")
+        hdic['author'] = author[0].text.strip()[3:]
 
-        p2 = lxml.html.fromstring(n2.read())
-        hl2 = p2.xpath("//span[@class='highlight']")
-        for h in hl2:
-            print h.text
-        next_book2 = p2.xpath("//a[@id='nextBookLink']")
-        next_url2 = ''
-        for nb in next_book2:
-            next_url2 = nb.attrib['href']
-            print next_url2
+        harray = []
+        highlights = dom.xpath("//span[@class='highlight']")
+        for h in highlights:
+            harray.append(h.text)
+        hdic['text'] = harray
 
-        # scrape next ** 3 book
-        n3 = self.br.follow_link(url=next_url2)
+        self.books2highlighs[title] = hdic
 
-        p3 = lxml.html.fromstring(n3.read())
-        next_book3 = p3.xpath("//a[@id='nextBookLink']")
-        if len(next_book3) == 0:
-            print 'end'
+        # get next book
+        next_book = dom.xpath("//a[@id='nextBookLink']")
+        next_url = next_book[0].attrib['href']
+        if not re.search('upcoming_asin', next_url):
+            return
         else:
-            for nb in next_book3:
-                print nb.attrib['href']
+            next_page = self.br.follow_link(url=next_url)
+            self.get_next_books(next_page)
         
 def main():
     config = Pit.get('amazon.co.jp', {'require': {'email': 'email', 'password': 'password'}})
 
     domain = 'jp'
     kindle = KindleHighlight(config['email'], config['password'], domain)
+
+    for k, v in kindle.books2highlighs.items():
+        print '[title] %s' % k
+        print '[author] %s' % v['author']
+        for text in v['text']:
+            print text
     
 if __name__ == '__main__':
     main()
