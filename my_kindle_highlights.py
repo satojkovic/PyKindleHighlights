@@ -20,7 +20,7 @@ class KindleHighlight(object):
         self.br.select_form(name = 'signIn')
         self.br['email'] = email
         self.br['password'] = password
-        self.highlighted_books = 0
+        self.books2highlighs = dict(dict([]))
 
         signedin_page = self.br.submit()
         self.scrape_highlights(signedin_page)
@@ -31,15 +31,20 @@ class KindleHighlight(object):
         # get next link
         root = lxml.html.fromstring(highlights_page.read())
 
+        t1 = root.xpath("//span[@class='title']/a")
+        for t in t1:
+            print t.text.strip()
+        a1 = root.xpath("//span[@class='author']")
+        for a in a1:
+            print a.text.strip()
         hl = root.xpath("//span[@class='highlight']")
         for h in hl:
-            print h.text
+            print h.text.strip()
         next_book = root.xpath("//a[@id='nextBookLink']")
         next_url = ''
         for nb in next_book:
             next_url = nb.attrib['href']
             print nb.attrib['href']
-            self.highlighted_books += 1
 
         # scrape next book
         n1 = self.br.follow_link(url=next_url)
@@ -54,7 +59,6 @@ class KindleHighlight(object):
         for nb in next_book1:
             next_url1 = nb.attrib['href']
             print next_url1
-            self.highlighted_books += 1            
 
         # scrape next next book
         n2 = self.br.follow_link(url=next_url1)
@@ -68,7 +72,6 @@ class KindleHighlight(object):
         for nb in next_book2:
             next_url2 = nb.attrib['href']
             print next_url2
-            self.highlighted_books += 1            
 
         # scrape next ** 3 book
         n3 = self.br.follow_link(url=next_url2)
@@ -80,15 +83,12 @@ class KindleHighlight(object):
         else:
             for nb in next_book3:
                 print nb.attrib['href']
-                self.highlighted_books += 1                
         
 def main():
     config = Pit.get('amazon.co.jp', {'require': {'email': 'email', 'password': 'password'}})
 
     domain = 'jp'
     kindle = KindleHighlight(config['email'], config['password'], domain)
-
-    print 'Highlighted Books: %d' % kindle.highlighted_books
     
 if __name__ == '__main__':
     main()
