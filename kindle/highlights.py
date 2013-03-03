@@ -1,19 +1,18 @@
 #-*- coding: utf-8 -*-
 
-from pit import Pit
 import mechanize
 import re
 import lxml.html
 
-class KindleHighlight(object):
-    def __init__(self, email, password, domain='jp'):
+class PyKindleHighlights(object):
+    """
+    scrape from kindle.amazon.co.jp/your_highlights
+    """
+    def __init__(self, email, password):
         self.br = mechanize.Browser()
         self.br.set_handle_robots(False)
         self.br.addheaders = [("User-agent", "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13")]
-        if domain == 'jp':
-            page = self.br.open("https://www.amazon.co.jp/ap/signin?openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fkindle.amazon.co.jp%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.assoc_handle=amzn_kindle_jp&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0")
-        else:
-            page = self.br.open("https://www.amazon.com/ap/signin?openid.assoc_handle=amzn_kindle&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.pape.max_auth_age=0&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.return_to=https%3A%2F%2Fkindle.amazon.com%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle")
+        page = self.br.open("https://www.amazon.co.jp/ap/signin?openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fkindle.amazon.co.jp%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.assoc_handle=amzn_kindle_jp&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0")
 
         page.set_data(re.sub('<!DOCTYPE(.*)>', '', page.get_data()))
         self.br.set_response(page)
@@ -59,18 +58,4 @@ class KindleHighlight(object):
         else:
             next_page = self.br.follow_link(url=next_url)
             self.get_next_books(next_page)
-        
-def main():
-    config = Pit.get('amazon.co.jp', {'require': {'email': 'email', 'password': 'password'}})
 
-    domain = 'jp'
-    kindle = KindleHighlight(config['email'], config['password'], domain)
-
-    for k, v in kindle.books2highlighs.items():
-        print '[title] %s' % k
-        print '[author] %s' % v['author']
-        for text in v['text']:
-            print text
-    
-if __name__ == '__main__':
-    main()
