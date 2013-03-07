@@ -2,7 +2,7 @@
 
 import mechanize
 import re
-import lxml.html
+from pyquery import PyQuery as pq
 
 class PyKindleHighlights(object):
     """
@@ -32,18 +32,18 @@ class PyKindleHighlights(object):
         self.get_next_books(highlights_page)
 
     def get_next_books(self, page):
-        dom = lxml.html.fromstring(page.read())
+        d = pq(page.read())
 
         # get title, author, highlights
-        title = dom.xpath("//span[@class='title']/a")
+        title = d("span.title>a")
         title = title[0].text.strip()
 
         hdic = {}
-        author = dom.xpath("//span[@class='author']")
+        author = d("span.author")
         hdic['author'] = author[0].text.strip()[3:]
 
         harray = []
-        highlights = dom.xpath("//span[@class='highlight']")
+        highlights = d("span.highlight")
         for h in highlights:
             harray.append(h.text)
         hdic['text'] = harray
@@ -51,7 +51,7 @@ class PyKindleHighlights(object):
         self.books2highlights[title] = hdic
 
         # get next book
-        next_book = dom.xpath("//a[@id='nextBookLink']")
+        next_book = d("a#nextBookLink")
         next_url = next_book[0].attrib['href']
         if not re.search('upcoming_asin', next_url):
             return
