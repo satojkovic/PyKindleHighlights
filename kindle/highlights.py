@@ -6,7 +6,7 @@ from pyquery import PyQuery as pq
 
 class PyKindleHighlights(object):
     """
-    scrape from kindle.amazon.co.jp/your_highlights
+    scrape highlights from kindle.amazon.co.jp
     """
     def __init__(self, email, password):
         self.br = mechanize.Browser()
