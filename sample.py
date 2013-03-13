@@ -8,11 +8,11 @@ def main():
 
     kindle = PyKindleHighlights(config['email'], config['password'])
 
-    for k, v in kindle.books2highlights.items():
-        print '[title] %s' % k
-        print '[author] %s' % v['author']
-        for text in v['text']:
-            print text
+    for highlight in kindle.highlights:
+        print '[title] %s' %highlight.title
+        print '[author] %s' %highlight.author
+        for i in range(len(highlight.text)):
+            print '(%d) %s' %(i+1, highlight.text[i])
     
 if __name__ == '__main__':
     main()
