@@ -1,6 +1,6 @@
 PyKindleHighlights
 ==================
-Scraping kindle highlights.  
+Scraping kindle highlights from kindle.amazon.co.jp (jp only)
 
 Example Usage
 ==================
