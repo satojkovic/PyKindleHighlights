@@ -2,6 +2,11 @@ PyKindleHighlights
 ==================
 Scraping kindle highlights from kindle.amazon.co.jp (jp only)
 
+Required Packages
+==================
++ mechanize
++ pyquery
+
 Example Usage
 ==================
 
