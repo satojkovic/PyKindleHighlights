@@ -10,10 +10,18 @@ class PyKindleHighlights(object):
     scrape highlights from kindle.amazon.co.jp
     """
     def __init__(self, email, password):
+        self.email = email
+        self.password = password
+
+        self.__setup_mech_agent()
+        self.__scrape_highlights()
+
+    def __setup_mech_agent(self):
         self.br = mechanize.Browser()
         self.br.set_handle_robots(False)
         self.br.addheaders = [(
-            "User-agent", "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13"
+            "User-agent",
+            "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.13) Gecko/20101206 Ubuntu/10.10 (maverick) Firefox/3.6.13"
         )]
 
         page = self.br.open(
@@ -23,13 +31,10 @@ class PyKindleHighlights(object):
         self.br.set_response(page)
 
         self.br.select_form(name='signIn')
-        self.br['email'] = email
-        self.br['password'] = password
+        self.br['email'] = self.email
+        self.br['password'] = self.password
 
-        # scrape kindle highlights
-        self.scrape_highlights()
-
-    def scrape_highlights(self):
+    def __scrape_highlights(self):
         # sign in
         signedin_page = self.br.submit()
 
@@ -38,9 +43,9 @@ class PyKindleHighlights(object):
 
         # get highlights recursively
         self.highlights = []
-        self.get_next_highlights(highlights_page, self.highlights)
+        self.__get_next_highlights(highlights_page, self.highlights)
 
-    def get_next_highlights(self, page, highlights):
+    def __get_next_highlights(self, page, highlights):
         dom = pq(page.read())
 
         # get title, author, highlights
@@ -53,7 +58,7 @@ class PyKindleHighlights(object):
             return
         else:
             next_page = self.br.follow_link(url=next_url)
-            self.get_next_highlights(next_page, highlights)
+            self.__get_next_highlights(next_page, highlights)
 
     class Highlight:
         def __init__(self, dom):
