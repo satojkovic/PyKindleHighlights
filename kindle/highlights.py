@@ -5,6 +5,15 @@ import re
 from pyquery import PyQuery as pq
 
 
+class Highlight:
+    def __init__(self, dom):
+        self.text = []
+        for h in dom("span.highlight"):
+            self.text.append(h.text)
+            self.title = dom("span.title>a")[0].text.strip()
+            self.author = dom("span.author")[0].text.strip()[3:]
+
+
 class PyKindleHighlights(object):
     """
     scrape highlights from kindle.amazon.co.jp
@@ -49,7 +58,7 @@ class PyKindleHighlights(object):
         dom = pq(page.read())
 
         # get title, author, highlights
-        highlights.append(self.Highlight(dom))
+        highlights.append(Highlight(dom))
 
         # get next book
         next_book = dom("a#nextBookLink")
@@ -59,11 +68,3 @@ class PyKindleHighlights(object):
         else:
             next_page = self.br.follow_link(url=next_url)
             self.__get_next_highlights(next_page, highlights)
-
-    class Highlight:
-        def __init__(self, dom):
-            self.text = []
-            for h in dom("span.highlight"):
-                self.text.append(h.text)
-            self.title = dom("span.title>a")[0].text.strip()
-            self.author = dom("span.author")[0].text.strip()[3:]
