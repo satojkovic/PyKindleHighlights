@@ -1,16 +1,4 @@
 #-*- coding:utf-8 -*-
-
-"""
-Usage:
-    khighlights2md.py
-    khighlights2md.py -h | --help
-    khighlights2md.py --version
-
-Options:
-    -h --help    show this screen
-    --version    show version
-"""
-
 from docopt import docopt
 from pit import Pit
 from kindle.highlights import PyKindleHighlights
@@ -18,7 +6,6 @@ import html2text
 
 
 def main():
-    options = docopt(__doc__, version="1.0")
     config = Pit.get('amazon.co.jp',
                      {'require': {'email': 'email', 'password': 'password'}})
 
