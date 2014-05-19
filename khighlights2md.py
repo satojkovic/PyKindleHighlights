@@ -7,7 +7,8 @@ import html2text
 
 def main():
     config = Pit.get('amazon.co.jp',
-                     {'require': {'email': 'email', 'password': 'password'}})
+                     {'require': {'email': 'email',
+                                  'password': 'password'}})
 
     kindle = PyKindleHighlights(config['email'], config['password'])
     highlights = [highlight for highlight in kindle.highlights]
